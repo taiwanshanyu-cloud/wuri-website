@@ -1,6 +1,13 @@
 [build]
+  command = "npm install"
   publish = "public"
   functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "20"
 
 # Netlify Identity 登入後導回頁面用的重新導向規則
 [[redirects]]
