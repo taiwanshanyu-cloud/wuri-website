@@ -1,0 +1,8 @@
+{
+  "name": "wuri-women-center-site",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^7.0.0"
+  }
+}
