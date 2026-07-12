@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>管理後台・臺中市烏日婦女及新住民培力中心</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<style>
+  :root{
+    --brown:#B9764B; --brown-deep:#8A5A1F; --bg:#FBF6EE; --ink:#2B241C; --ink-soft:#6B6255;
+    --line:#EAE1D2; --white:#FFFFFF; --danger:#B85C4A; --ok:#5C8A5A;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;background:var(--bg);color:var(--ink);}
+  .topbar{background:var(--white);border-bottom:1px solid var(--line);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+  .topbar h1{font-size:16px;margin:0;}
+  .topbar .user{font-size:12.5px;color:var(--ink-soft);}
+  .btn{border:none;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;}
+  .btn-primary{background:var(--brown);color:#fff;}
+  .btn-ghost{background:var(--white);border:1px solid var(--line);color:var(--ink-soft);}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .gate{max-width:420px;margin:80px auto;text-align:center;padding:0 20px;}
+  .gate h2{font-size:20px;}
+  .gate p{color:var(--ink-soft);font-size:13.5px;line-height:1.7;}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 20px 80px;display:none;}
+  .wrap.show{display:block;}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{padding:9px 16px;border-radius:999px;background:var(--white);border:1px solid var(--line);font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-soft);}
+  .tab.active{background:var(--brown);color:#fff;border-color:var(--brown);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .card{background:var(--white);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 4px 12px rgba(43,36,28,.06);}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;font-weight:700;}
+  .field input, .field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;font-family:inherit;}
+  .field textarea{min-height:80px;resize:vertical;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  .item:last-child{border-bottom:none;}
+  .item-title{font-size:13.5px;font-weight:700;}
+  .item-sub{font-size:11.5px;color:var(--ink-soft);}
+  .item-actions{display:flex;gap:6px;flex-shrink:0;}
+  .item-actions button{padding:6px 12px;font-size:11.5px;}
+  .status-msg{font-size:12.5px;margin-top:8px;padding:8px 12px;border-radius:8px;display:none;}
+  .status-msg.ok{display:block;background:#EAF3EA;color:var(--ok);}
+  .status-msg.err{display:block;background:#F6E8E5;color:var(--danger);}
+  .section-title{font-size:15px;font-weight:700;margin:0 0 12px;}
+  .hint{font-size:11.5px;color:var(--ink-soft);margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <h1>🔒 管理後台</h1>
+    <div id="topbarRight" class="user"></div>
+  </div>
+
+  <div id="gate" class="gate">
+    <h2>需要管理員登入</h2>
+    <p>本後台僅開放已受邀請、且角色為「admin」的團隊成員登入。若您還沒有帳號，請聯繫主要管理者透過 Netlify 後台寄送邀請信。</p>
+    <button class="btn btn-primary" onclick="netlifyIdentity.open('login')">登入</button>
+  </div>
+
+  <div id="wrap" class="wrap">
+
+    <div class="tabs">
+      <button class="tab active" data-tab="about" onclick="switchTab('about')">關於中心</button>
+      <button class="tab" data-tab="events" onclick="switchTab('events')">活動花絮</button>
+      <button class="tab" data-tab="resources" onclick="switchTab('resources')">單位資訊</button>
+      <button class="tab" data-tab="users" onclick="switchTab('users')">帳號管理</button>
+    </div>
+
+    <!-- 關於中心 -->
+    <div class="panel active" id="panel-about">
+      <div class="card">
+        <div class="section-title">關於中心內容</div>
+        <div class="hint">這裡只編輯中文（繁體）版本，其他 6 種語言版本需另外請人工翻譯後手動更新，系統不會自動翻譯。</div>
+        <div class="field"><label>中心簡介 / 理念文字</label><textarea id="about-mission"></textarea></div>
+        <div class="row2">
+          <div class="field"><label>地址</label><input id="about-address" /></div>
+          <div class="field"><label>電話</label><input id="about-phone" /></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Email</label><input id="about-email" /></div>
+          <div class="field"><label>服務時間</label><input id="about-hours" /></div>
+        </div>
+        <div class="field"><label>服務內容（逗號分隔）</label><textarea id="about-services"></textarea></div>
+        <button class="btn btn-primary" onclick="saveAbout()">儲存變更</button>
+        <div id="about-status" class="status-msg"></div>
+      </div>
+    </div>
+
+    <!-- 活動花絮 -->
+    <div class="panel" id="panel-events">
+      <div class="card">
+        <div class="section-title">新增活動花絮</div>
+        <div class="hint">照片請先上傳到任何圖床（例如 Facebook 貼文、Google 相簿分享連結）取得圖片網址，再貼到下方欄位。</div>
+        <input type="hidden" id="event-id" />
+        <div class="field"><label>活動標題</label><input id="event-title" /></div>
+        <div class="row2">
+          <div class="field"><label>日期</label><input id="event-date" type="date" /></div>
+          <div class="field"><label>照片網址</label><input id="event-photo" placeholder="https://..." /></div>
+        </div>
+        <div class="field"><label>活動說明</label><textarea id="event-desc"></textarea></div>
+        <button class="btn btn-primary" onclick="saveEvent()">新增／儲存這筆活動</button>
+        <button class="btn btn-ghost" onclick="clearEventForm()">清空表單</button>
+        <div id="events-status" class="status-msg"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">目前所有活動</div>
+        <div id="events-list"></div>
+      </div>
+    </div>
+
+    <!-- 單位資訊 -->
+    <div class="panel" id="panel-resources">
+      <div class="card">
+        <div class="section-title">新增／編輯資源單位</div>
+        <div class="hint">這裡新增或修改的單位，會與原本 126 筆資料一起顯示在前台資源地圖上。修改「地址／電話」前請務必先電話確認過，不要憑印象填寫。</div>
+        <input type="hidden" id="res-id" />
+        <div class="field"><label>單位名稱</label><input id="res-name" /></div>
+        <div class="row2">
+          <div class="field"><label>行政區</label>
+            <select id="res-district" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;">
+              <option value="大肚區">大肚區</option><option value="烏日區">烏日區</option><option value="龍井區">龍井區</option>
+            </select>
+          </div>
+          <div class="field"><label>服務類別</label><input id="res-cat" placeholder="例如：社區培力" /></div>
+        </div>
+        <div class="field"><label>地址（未確認請留空）</label><input id="res-addr" /></div>
+        <div class="row2">
+          <div class="field"><label>電話（未確認請留空）</label><input id="res-phone" /></div>
+          <div class="field"><label>服務時間</label><input id="res-hours" /></div>
+        </div>
+        <div class="field"><label>服務內容</label><textarea id="res-desc"></textarea></div>
+        <div class="field"><label>備註</label><input id="res-note" /></div>
+        <button class="btn btn-primary" onclick="saveResource()">新增／儲存這筆單位</button>
+        <button class="btn btn-ghost" onclick="clearResourceForm()">清空表單</button>
+        <div id="resources-status" class="status-msg"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">後台新增／異動過的單位</div>
+        <div class="hint">原本就有的 126 筆資料要修改，也是先在上面表單填入「相同名稱」儲存，會用名稱比對覆蓋前台顯示內容。</div>
+        <div id="resources-list"></div>
+      </div>
+    </div>
+
+    <!-- 帳號管理 -->
+    <div class="panel" id="panel-users">
+      <div class="card">
+        <div class="section-title">邀請新的管理員</div>
+        <div class="hint">輸入 Email 後對方會收到 Netlify 寄出的邀請信，設定密碼後即可登入本後台。邀請時就會直接給予 admin 權限。</div>
+        <div class="field"><label>Email</label><input id="user-email" placeholder="name@example.com" /></div>
+        <button class="btn btn-primary" onclick="inviteUser()">送出邀請</button>
+        <div id="users-status" class="status-msg"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">目前所有帳號</div>
+        <div class="hint">「移除 admin 權限」不會刪除帳號，只是讓對方不能再編輯網站；「刪除帳號」則是整個帳號都移除。</div>
+        <div id="users-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+const FN = '/.netlify/functions/content';
+let currentUser = null;
+
+netlifyIdentity.on('init', user => { currentUser = user; renderAuthState(); });
+netlifyIdentity.on('login', user => { currentUser = user; renderAuthState(); netlifyIdentity.close(); });
+netlifyIdentity.on('logout', () => { currentUser = null; renderAuthState(); });
+netlifyIdentity.init();
+
+function isAdmin(user){
+  return !!(user && user.app_metadata && user.app_metadata.roles && user.app_metadata.roles.includes('admin'));
+}
+
+function renderAuthState(){
+  const gate = document.getElementById('gate');
+  const wrap = document.getElementById('wrap');
+  const topbarRight = document.getElementById('topbarRight');
+  if (currentUser && isAdmin(currentUser)){
+    gate.style.display = 'none';
+    wrap.classList.add('show');
+    topbarRight.innerHTML = currentUser.email + ' &nbsp;<button class="btn btn-ghost" style="padding:6px 12px;font-size:11.5px;" onclick="netlifyIdentity.logout()">登出</button>';
+    loadAll();
+  } else if (currentUser && !isAdmin(currentUser)){
+    gate.style.display = 'block';
+    gate.querySelector('h2').textContent = '此帳號沒有管理員權限';
+    gate.querySelector('p').textContent = '您的帳號已登入，但尚未被設定為 admin 角色，請聯繫主要管理者到 Netlify 後台的 Identity 設定中，把您的角色改為 admin。';
+    wrap.classList.remove('show');
+  } else {
+    gate.style.display = 'block';
+    wrap.classList.remove('show');
+    topbarRight.textContent = '';
+  }
+}
+
+function authHeader(){
+  const token = currentUser && currentUser.token && currentUser.token.access_token;
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id === 'panel-'+name));
+}
+
+function showStatus(id, msg, ok){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status-msg ' + (ok ? 'ok' : 'err');
+  setTimeout(()=>{ el.className='status-msg'; }, 4000);
+}
+
+async function loadAll(){
+  loadAbout();
+  loadEvents();
+  loadResources();
+  loadUsers();
+}
+
+// ---- 帳號管理（直接呼叫 Netlify Identity 官方管理 API，需要目前登入者具備 admin 角色）----
+const IDENTITY_ADMIN = window.location.origin + '/.netlify/identity/admin';
+
+async function loadUsers(){
+  const list = document.getElementById('users-list');
+  try{
+    const res = await fetch(IDENTITY_ADMIN + '/users', { headers: authHeader() });
+    if (!res.ok){ list.innerHTML = '<p class="hint">讀取帳號清單失敗（' + res.status + '），請確認 Identity 服務已在 Netlify 後台開通。</p>'; return; }
+    const json = await res.json();
+    const users = json.users || json || [];
+    list.innerHTML = users.length ? '' : '<p class="hint">目前沒有任何帳號</p>';
+    users.forEach(u=>{
+      const roles = (u.app_metadata && u.app_metadata.roles) || [];
+      const row = document.createElement('div');
+      row.className = 'item';
+      row.innerHTML = `<div><div class="item-title">${u.email}</div><div class="item-sub">${roles.includes('admin') ? '✅ admin' : '（無 admin 權限）'} ・ ${u.confirmed_at ? '已啟用' : '尚未設定密碼'}</div></div>
+        <div class="item-actions">
+          ${roles.includes('admin')
+            ? `<button class="btn btn-ghost" onclick="setAdminRole('${u.id}', false)">移除 admin</button>`
+            : `<button class="btn btn-primary" onclick="setAdminRole('${u.id}', true)">設為 admin</button>`}
+          <button class="btn btn-danger" onclick="deleteUserAccount('${u.id}','${u.email}')">刪除帳號</button>
+        </div>`;
+      list.appendChild(row);
+    });
+  } catch(e){
+    list.innerHTML = '<p class="hint">讀取帳號清單發生錯誤：' + e.message + '</p>';
+  }
+}
+
+async function inviteUser(){
+  const email = document.getElementById('user-email').value.trim();
+  if (!email){ showStatus('users-status','請輸入 Email',false); return; }
+  const res = await fetch(IDENTITY_ADMIN + '/users', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', ...authHeader() },
+    body: JSON.stringify({ email, app_metadata: { roles: ['admin'] } })
+  });
+  if (res.ok){
+    showStatus('users-status', '邀請已送出，請請對方查收信箱', true);
+    document.getElementById('user-email').value = '';
+    loadUsers();
+  } else {
+    const t = await res.text();
+    showStatus('users-status', '邀請失敗：' + t, false);
+  }
+}
+
+async function setAdminRole(userId, makeAdmin){
+  const res = await fetch(IDENTITY_ADMIN + '/users/' + userId, {
+    method: 'PUT',
+    headers: { 'Content-Type':'application/json', ...authHeader() },
+    body: JSON.stringify({ app_metadata: { roles: makeAdmin ? ['admin'] : [] } })
+  });
+  if (res.ok) loadUsers();
+  else showStatus('users-status', '更新權限失敗', false);
+}
+
+async function deleteUserAccount(userId, email){
+  if (!confirm('確定要刪除帳號 ' + email + ' 嗎？此動作無法復原。')) return;
+  const res = await fetch(IDENTITY_ADMIN + '/users/' + userId, { method: 'DELETE', headers: authHeader() });
+  if (res.ok) loadUsers();
+  else showStatus('users-status', '刪除失敗', false);
+}
+
+// ---- 關於中心 ----
+async function loadAbout(){
+  const res = await fetch(FN + '?type=about');
+  const { data } = await res.json();
+  document.getElementById('about-mission').value = data.mission || '';
+  document.getElementById('about-address').value = data.address || '';
+  document.getElementById('about-phone').value = data.phone || '';
+  document.getElementById('about-email').value = data.email || '';
+  document.getElementById('about-hours').value = data.hours || '';
+  document.getElementById('about-services').value = data.services || '';
+}
+async function saveAbout(){
+  const data = {
+    mission: document.getElementById('about-mission').value,
+    address: document.getElementById('about-address').value,
+    phone: document.getElementById('about-phone').value,
+    email: document.getElementById('about-email').value,
+    hours: document.getElementById('about-hours').value,
+    services: document.getElementById('about-services').value,
+  };
+  const res = await fetch(FN + '?type=about', { method:'POST', headers:{'Content-Type':'application/json', ...authHeader()}, body: JSON.stringify({ data }) });
+  if (res.ok) showStatus('about-status', '已儲存', true);
+  else showStatus('about-status', '儲存失敗，請確認登入狀態', false);
+}
+
+// ---- 活動花絮 ----
+function clearEventForm(){
+  ['event-id','event-title','event-date','event-photo','event-desc'].forEach(id=>document.getElementById(id).value='');
+}
+async function loadEvents(){
+  const res = await fetch(FN + '?type=events');
+  const { data } = await res.json();
+  const list = document.getElementById('events-list');
+  list.innerHTML = data.length ? '' : '<p class="hint">還沒有任何活動</p>';
+  data.slice().reverse().forEach(ev=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `<div><div class="item-title">${ev.title||'(未命名)'}</div><div class="item-sub">${ev.date||''}</div></div>
+      <div class="item-actions">
+        <button class="btn btn-ghost" onclick='editEvent(${JSON.stringify(JSON.stringify(ev))})'>編輯</button>
+        <button class="btn btn-danger" onclick="deleteEvent('${ev.id}')">刪除</button>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+function editEvent(evJson){
+  const ev = JSON.parse(evJson);
+  document.getElementById('event-id').value = ev.id;
+  document.getElementById('event-title').value = ev.title || '';
+  document.getElementById('event-date').value = ev.date || '';
+  document.getElementById('event-photo').value = ev.photoUrl || '';
+  document.getElementById('event-desc').value = ev.description || '';
+}
+async function saveEvent(){
+  const id = document.getElementById('event-id').value || ('ev-' + Date.now());
+  const data = {
+    id,
+    title: document.getElementById('event-title').value,
+    date: document.getElementById('event-date').value,
+    photoUrl: document.getElementById('event-photo').value,
+    description: document.getElementById('event-desc').value,
+  };
+  const res = await fetch(FN + '?type=events', { method:'POST', headers:{'Content-Type':'application/json', ...authHeader()}, body: JSON.stringify({ data }) });
+  if (res.ok){ showStatus('events-status','已儲存',true); clearEventForm(); loadEvents(); }
+  else showStatus('events-status','儲存失敗，請確認登入狀態',false);
+}
+async function deleteEvent(id){
+  if (!confirm('確定刪除這筆活動？')) return;
+  const res = await fetch(FN + '?type=events&id=' + encodeURIComponent(id), { method:'DELETE', headers: authHeader() });
+  if (res.ok) loadEvents();
+}
+
+// ---- 單位資訊 ----
+function clearResourceForm(){
+  ['res-id','res-name','res-cat','res-addr','res-phone','res-hours','res-desc','res-note'].forEach(id=>document.getElementById(id).value='');
+}
+async function loadResources(){
+  const res = await fetch(FN + '?type=resources');
+  const { data } = await res.json();
+  const list = document.getElementById('resources-list');
+  list.innerHTML = data.length ? '' : '<p class="hint">後台還沒有新增或修改過任何單位</p>';
+  data.slice().reverse().forEach(r=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `<div><div class="item-title">${r.name||'(未命名)'}</div><div class="item-sub">${r.district||''}・${r.category||''}</div></div>
+      <div class="item-actions">
+        <button class="btn btn-ghost" onclick='editResource(${JSON.stringify(JSON.stringify(r))})'>編輯</button>
+        <button class="btn btn-danger" onclick="deleteResource('${r.id}')">刪除</button>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+function editResource(rJson){
+  const r = JSON.parse(rJson);
+  document.getElementById('res-id').value = r.id;
+  document.getElementById('res-name').value = r.name || '';
+  document.getElementById('res-district').value = r.district || '大肚區';
+  document.getElementById('res-cat').value = r.category || '';
+  document.getElementById('res-addr').value = r.address || '';
+  document.getElementById('res-phone').value = r.phone || '';
+  document.getElementById('res-hours').value = r.hours || '';
+  document.getElementById('res-desc').value = r.desc || '';
+  document.getElementById('res-note').value = r.note || '';
+}
+async function saveResource(){
+  const id = document.getElementById('res-id').value || ('res-' + Date.now());
+  const data = {
+    id,
+    name: document.getElementById('res-name').value,
+    district: document.getElementById('res-district').value,
+    category: document.getElementById('res-cat').value,
+    address: document.getElementById('res-addr').value,
+    phone: document.getElementById('res-phone').value,
+    hours: document.getElementById('res-hours').value,
+    desc: document.getElementById('res-desc').value,
+    note: document.getElementById('res-note').value,
+  };
+  const res = await fetch(FN + '?type=resources', { method:'POST', headers:{'Content-Type':'application/json', ...authHeader()}, body: JSON.stringify({ data }) });
+  if (res.ok){ showStatus('resources-status','已儲存',true); clearResourceForm(); loadResources(); }
+  else showStatus('resources-status','儲存失敗，請確認登入狀態',false);
+}
+async function deleteResource(id){
+  if (!confirm('確定刪除這筆單位？')) return;
+  const res = await fetch(FN + '?type=resources&id=' + encodeURIComponent(id), { method:'DELETE', headers: authHeader() });
+  if (res.ok) loadResources();
+}
+</script>
+</body>
+</html>
