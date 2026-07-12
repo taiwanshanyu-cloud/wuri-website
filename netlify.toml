@@ -1,0 +1,14 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+# Netlify Identity 登入後導回頁面用的重新導向規則
+[[redirects]]
+  from = "/.netlify/identity/*"
+  to = "/.netlify/identity/:splat"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
